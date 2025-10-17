@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Verify OTP</title>
+<style>
+body {
+    font-family: sans-serif;
+    background: #222;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    background: #333;
+    padding: 30px;
+    border-radius: 10px;
+    width: 350px;
+    text-align: center;
+    position: relative;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    text-align: center;
+    letter-spacing: 3px;
+    transition: 0.3s;
+}
+input.success { border-color: #21FF00; }
+input.error { border-color: #FF3B30; }
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+button[type="submit"] { background: #4caf50; color: #fff; }
+button[type="submit"]:hover { background: #45a049; }
+
+.flash {
+    position: absolute;
+    top: 10px;
+    width: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    animation: fadeout 5s forwards;
+}
+.flash.success { background: #21FF00; color: #000; }
+.flash.error { background: #FF3B30; color: #fff; }
+
+@keyframes fadeout {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+}
+
+.cooldown {
+    color: #ccc;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, msg in messages %}
+            <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <h2>Enter OTP</h2>
+    <form method="POST">
+        <input type="text" id="otp-input" name="otp" placeholder="6-digit OTP" maxlength="6" required>
+        <button type="submit">Verify</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('resend_otp') }}">
+        <button type="submit" id="resend-btn" disabled>Resend OTP</button>
+    </form>
+
+    <div class="cooldown" id="countdown"></div>
+    <a href="/">Back to login</a>
+</div>
+
+<script>
+let resendBtn = document.getElementById('resend-btn');
+let countdownDiv = document.getElementById('countdown');
+let otpInput = document.getElementById('otp-input');
+let otpSentAt = {{ otp_sent_at|default(0) }};
+let RESEND_COOLDOWN = 60;
+
+function updateCountdown() {
+    let now = Math.floor(Date.now() / 1000);
+    let remaining = RESEND_COOLDOWN - (now - otpSentAt);
+    if (remaining > 0) {
+        resendBtn.disabled = true;
+        countdownDiv.textContent = "Wait " + remaining + "s before resending OTP";
+        setTimeout(updateCountdown, 1000);
+    } else {
+        resendBtn.disabled = false;
+        countdownDiv.textContent = "";
+    }
+}
+updateCountdown();
+
+// Highlight OTP input based on last flash
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, msg in messages %}
+            {% if category == 'success' %}
+                otpInput.classList.add('success');
+            {% elif category == 'error' %}
+                otpInput.classList.add('error');
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+</script>
+</body>
+</html>

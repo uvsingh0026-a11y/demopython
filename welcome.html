@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Welcome</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* Reset and basic styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: sans-serif;
+}
+
+/* Background image covering entire screen */
+body {
+    background: url("https://thumbs.dreamstime.com/b/decorated-diya-oil-lamp-happy-diwali-sign-set-bed-rose-petals-celebration-hindu-festival-diwali-deepavali-festival-389588303.jpg") no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container for welcome message */
+.container {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    color: #fff;
+    position: relative;
+}
+
+/* Welcome message */
+.container h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.container p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+/* Logout button fixed at top-right corner */
+.logout-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ff4b2b;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.3s ease;
+    z-index: 1000;
+}
+
+.logout-btn:hover {
+    background: #ff3b00;
+}
+
+/* Flash messages */
+.flash {
+    position: absolute;
+    top: 10px;
+    width: 90%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    animation: fadeout 5s forwards;
+}
+.flash.success { background: rgba(0,255,0,0.9); color: #000; }
+.flash.error { background: rgba(255,0,0,0.9); color: #fff; }
+
+@keyframes fadeout {
+    0% {opacity:1;}
+    80% {opacity:1;}
+    100% {opacity:0; display:none;}
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container h1 { font-size: 1.5rem; }
+    .container p { font-size: 1rem; }
+    .logout-btn { padding: 8px 16px; font-size: 0.9rem; top: 10px; right: 10px; }
+}
+
+@media (max-width: 480px) {
+    .container { padding: 1.5rem; }
+    .container h1 { font-size: 1.2rem; }
+    .container p { font-size: 0.9rem; }
+    .logout-btn { padding: 6px 12px; font-size: 0.8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- Logout button fixed top-right -->
+<a href="/logout" class="logout-btn">Logout</a>
+
+<!-- Centered container -->
+<div class="container">
+    <h1>Welcome {{username}} 👋</h1>
+    <p>Your account is verified!</p>
+</div>
+
+</body>
+</html>
